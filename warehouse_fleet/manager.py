@@ -22,7 +22,12 @@ FAULT_RECOVERY_MS: dict[FaultKind, int] = {
 class FleetManager:
     """Deterministic controller for mission assignment, quarantine, and recovery."""
 
-    def __init__(self, robot_count: int = 5, store: EventStore | None = None) -> None:
+    def __init__(
+        self,
+        robot_count: int = 5,
+        store: EventStore | None = None,
+        automatic_recovery: bool = True,
+    ) -> None:
         if robot_count < 1:
             raise ValueError("robot_count must be positive")
         self.now_ms = 0
@@ -31,9 +36,14 @@ class FleetManager:
         self.queue: deque[str] = deque()
         self.incidents: dict[str, Incident] = {}
         self.store = store or EventStore()
+        self.automatic_recovery = automatic_recovery
         self._incident_counter = 0
         self._faults_injected = 0
         self._faults_recovered = 0
+        self._availability_sum = 0.0
+        self._availability_samples = 0
+        self.audit_log: list[dict[str, object]] = []
+        self.store.snapshot(self.now_ms, self.robots.values())
 
     def submit_mission(self, mission_id: str, duration_ms: int = 2_000) -> Mission:
         if mission_id in self.missions:
@@ -64,7 +74,7 @@ class FleetManager:
         self.incidents[incident.incident_id] = incident
         robot.status = RobotStatus.QUARANTINED
         robot.fault = fault
-        robot.recover_at_ms = self.now_ms + FAULT_RECOVERY_MS[fault]
+        robot.recover_at_ms = self.now_ms + FAULT_RECOVERY_MS[fault] if self.automatic_recovery else None
         if mission_id is not None:
             mission = self.missions[mission_id]
             robot.failed_missions += 1
@@ -80,6 +90,25 @@ class FleetManager:
         self.store.save_incident(incident)
         return incident
 
+    def operator_inject_fault(self, robot_id: str, fault: FaultKind, actor: str = "operator") -> Incident:
+        incident = self.inject_fault(robot_id, fault)
+        self._audit(actor, "inject_fault", robot_id, {"fault": fault.value, "incident_id": incident.incident_id})
+        return incident
+
+    def force_recover(self, robot_id: str, actor: str = "operator") -> None:
+        robot = self.robots[robot_id]
+        if robot.status not in {RobotStatus.QUARANTINED, RobotStatus.RECOVERING}:
+            raise ValueError(f"{robot_id} is not quarantined")
+        robot.status = RobotStatus.RECOVERING
+        robot.recover_at_ms = self.now_ms
+        self._audit(actor, "force_recover", robot_id, {"fault": robot.fault.value if robot.fault else "unknown"})
+        self._recover_robots(force=True)
+
+    def _audit(self, actor: str, action: str, target: str, details: dict[str, object]) -> None:
+        record = {"timestamp_ms": self.now_ms, "actor": actor, "action": action, "target": target, "details": details}
+        self.audit_log.append(record)
+        self.store.save_audit(self.now_ms, actor, action, target, details)
+
     def tick(self, step_ms: int = 250) -> None:
         if step_ms <= 0:
             raise ValueError("step_ms must be positive")
@@ -92,6 +121,9 @@ class FleetManager:
                 robot.last_heartbeat_ms = self.now_ms
                 robot.last_odometry_ms = self.now_ms
                 robot.battery_pct = max(5.0, robot.battery_pct - (0.04 if robot.status == RobotStatus.BUSY else 0.005))
+        available = sum(r.status in {RobotStatus.HEALTHY, RobotStatus.BUSY} for r in self.robots.values())
+        self._availability_sum += available / len(self.robots)
+        self._availability_samples += 1
         self.store.snapshot(self.now_ms, self.robots.values())
 
     def run_until_idle(self, max_ms: int = 120_000, step_ms: int = 250) -> None:
@@ -99,7 +131,9 @@ class FleetManager:
         while self.now_ms < deadline:
             self.tick(step_ms)
             active = any(m.status in {MissionStatus.QUEUED, MissionStatus.RETRYING, MissionStatus.RUNNING} for m in self.missions.values())
-            recovering = any(r.status in {RobotStatus.QUARANTINED, RobotStatus.RECOVERING} for r in self.robots.values())
+            recovering = self.automatic_recovery and any(
+                r.status in {RobotStatus.QUARANTINED, RobotStatus.RECOVERING} for r in self.robots.values()
+            )
             if not active and not recovering:
                 return
         raise TimeoutError("fleet did not become idle")
@@ -136,7 +170,9 @@ class FleetManager:
             robot.mission_id = None
             self.store.save_mission(mission)
 
-    def _recover_robots(self) -> None:
+    def _recover_robots(self, force: bool = False) -> None:
+        if not self.automatic_recovery and not force:
+            return
         for robot in self.robots.values():
             if robot.recover_at_ms is None or self.now_ms < robot.recover_at_ms:
                 continue
@@ -172,4 +208,7 @@ class FleetManager:
             "automatic_recovery_pct": round(100 * self._faults_recovered / self._faults_injected, 2) if self._faults_injected else 0.0,
             "median_mission_latency_ms": int(median(latencies)) if latencies else 0,
             "mean_time_to_recovery_ms": round(sum(recoveries) / len(recoveries), 2) if recoveries else 0.0,
+            "fleet_availability_pct": round(100 * self._availability_sum / self._availability_samples, 2)
+            if self._availability_samples
+            else 100.0,
         }

@@ -1,0 +1,11 @@
+string mission_id
+string pickup_zone
+string dropoff_zone
+uint32 expected_duration_ms
+---
+bool completed
+string outcome
+uint32 elapsed_ms
+---
+float32 progress
+string state

@@ -37,6 +37,15 @@ CREATE TABLE telemetry (
     mission_id TEXT
 );
 
+CREATE TABLE operator_audit (
+    id BIGSERIAL PRIMARY KEY,
+    recorded_at TIMESTAMPTZ NOT NULL,
+    actor TEXT NOT NULL,
+    action TEXT NOT NULL,
+    target TEXT NOT NULL,
+    details JSONB NOT NULL DEFAULT '{}'::JSONB
+);
+
 CREATE INDEX incidents_robot_idx ON incidents(robot_id);
 CREATE INDEX incidents_fault_idx ON incidents(fault);
 CREATE INDEX telemetry_robot_recorded_idx ON telemetry(robot_id, recorded_at DESC);

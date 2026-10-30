@@ -24,8 +24,8 @@
     },
     {
       "type": "stat",
-      "title": "Available robots",
-      "targets": [{"expr": "sum(warehouse_robot_available)", "refId": "A"}],
+      "title": "Fleet availability",
+      "targets": [{"expr": "warehouse_fleet_availability_percent", "refId": "A"}],
       "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
     },
     {

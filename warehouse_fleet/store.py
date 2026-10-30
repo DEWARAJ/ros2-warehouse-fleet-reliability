@@ -12,7 +12,7 @@ class EventStore:
     """Local SQLite evidence store with a schema mirrored in database/schema.sql."""
 
     def __init__(self, path: str | Path = ":memory:") -> None:
-        self.connection = sqlite3.connect(str(path))
+        self.connection = sqlite3.connect(str(path), check_same_thread=False)
         self.connection.row_factory = sqlite3.Row
         self.connection.executescript(
             """
@@ -49,6 +49,14 @@ class EventStore:
                 status TEXT NOT NULL,
                 battery_pct REAL NOT NULL,
                 mission_id TEXT
+            );
+            CREATE TABLE IF NOT EXISTS operator_audit (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp_ms INTEGER NOT NULL,
+                actor TEXT NOT NULL,
+                action TEXT NOT NULL,
+                target TEXT NOT NULL,
+                details_json TEXT NOT NULL
             );
             CREATE INDEX IF NOT EXISTS idx_incidents_robot ON incidents(robot_id);
             CREATE INDEX IF NOT EXISTS idx_incidents_fault ON incidents(fault);
@@ -117,6 +125,13 @@ class EventStore:
 
     def query(self, sql: str) -> list[dict[str, object]]:
         return [dict(row) for row in self.connection.execute(sql).fetchall()]
+
+    def save_audit(self, timestamp_ms: int, actor: str, action: str, target: str, details: dict[str, object]) -> None:
+        self.connection.execute(
+            "INSERT INTO operator_audit(timestamp_ms, actor, action, target, details_json) VALUES (?, ?, ?, ?, ?)",
+            (timestamp_ms, actor, action, target, json.dumps(details, sort_keys=True)),
+        )
+        self.connection.commit()
 
     def close(self) -> None:
         self.connection.close()

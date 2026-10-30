@@ -10,6 +10,9 @@ warehouse_fleet_incidents_total 12
 # HELP warehouse_fleet_recovery_milliseconds Mean incident recovery time.
 # TYPE warehouse_fleet_recovery_milliseconds gauge
 warehouse_fleet_recovery_milliseconds 3791.67
+# HELP warehouse_fleet_availability_percent Mean available fleet capacity.
+# TYPE warehouse_fleet_availability_percent gauge
+warehouse_fleet_availability_percent 90.93
 warehouse_robot_available{robot_id="robot-01"} 1
 warehouse_robot_battery_percent{robot_id="robot-01"} 86.385
 warehouse_robot_completed_missions{robot_id="robot-01"} 51

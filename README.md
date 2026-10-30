@@ -16,6 +16,8 @@ python -m warehouse_fleet.cli --missions 250 --robots 5 --seed 2026
 
 See [`results/benchmark_summary.json`](results/benchmark_summary.json) for measured mission completion, injected faults, automatic recovery, mission latency, and mean time to recovery. The SQLite evidence database and Prometheus exposition are generated alongside it. Re-running with the same seed produces the same result.
 
+The controlled [recovery experiment](docs/recovery-comparison.md) uses 500 missions and identical faults in both conditions. Automatic recovery increased simulated fleet availability from 66.94% to 99.04%, increased throughput from 121.83 to 179.37 missions per minute, and reduced workload duration by 32.08%.
+
 ## Reliability behavior
 
 - capacity-aware mission assignment across a configurable fleet
@@ -28,6 +30,8 @@ See [`results/benchmark_summary.json`](results/benchmark_summary.json) for measu
 - SQLite evidence store for local execution and PostgreSQL schema for deployment
 - operational SQL for completion rate, throughput, per-robot failure rate, MTTR, p95 recovery, unresolved incidents, and downtime
 - Prometheus-format fleet and per-robot metrics
+- live HTTP operations API with operator-attributed fault and recovery commands
+- runtime PostgreSQL adapter used by the Docker Compose stack
 - incident runbooks for stale heartbeat, localization failure, and mission timeout
 
 ## Quick start
@@ -37,6 +41,25 @@ Python 3.11 or newer is the only dependency for the benchmark and tests.
 ```bash
 python -m unittest discover -s tests -v
 python -m warehouse_fleet.cli --missions 250 --robots 5 --seed 2026
+python -m warehouse_fleet.comparison
+```
+
+Start the live operations API and Prometheus endpoint:
+
+```bash
+python -m warehouse_fleet.server --port 9108
+```
+
+Available endpoints include `/health`, `/metrics`, `/api/summary`, `/api/robots`, `/api/missions`, `/api/incidents`, and `/api/audit`. Operators can inject and recover a fault with:
+
+```bash
+curl -X POST http://localhost:9108/api/faults \
+  -H "Content-Type: application/json" \
+  -d '{"robot_id":"robot-01","fault":"stale_heartbeat","actor":"field-engineer"}'
+
+curl -X POST http://localhost:9108/api/robots/robot-01/recover \
+  -H "Content-Type: application/json" \
+  -d '{"actor":"field-engineer"}'
 ```
 
 To start the PostgreSQL, Prometheus, and Grafana services:
@@ -57,6 +80,8 @@ Grafana is available at `http://localhost:3000`, Prometheus at `http://localhost
 | metrics are machine-readable | `results/fleet_metrics.prom` |
 | results are deterministic | `test_deterministic_benchmark_writes_evidence` |
 | incident response is documented | `runbooks/` |
+| recovery improves fleet capacity | `results/recovery_comparison.json` and `docs/recovery-comparison.md` |
+| operator actions are attributable | `/api/audit` and `operator_audit` table |
 
 ## Repository layout
 
@@ -66,6 +91,7 @@ tests/                 deterministic recovery and data-integrity tests
 analytics/             PostgreSQL operations queries
 database/              normalized PostgreSQL schema and indexes
 observability/         Prometheus and Grafana provisioning
+ros2_ws/               ROS 2 messages, action, controller, workers, fault injector
 runbooks/              operator incident-response procedures
 docs/                  architecture and ROS 2 integration mapping
 results/               generated benchmark evidence
@@ -73,7 +99,7 @@ results/               generated benchmark evidence
 
 ## ROS 2 integration
 
-The benchmark does not require ROS 2, but its robot state maps directly to ROS 2 diagnostics, odometry, battery messages, and Nav2 action feedback. [`docs/architecture.md`](docs/architecture.md) documents the adapter boundary so a Gazebo, Isaac Sim, or physical robot can replace each deterministic worker without changing the incident model or analytics schema.
+The benchmark does not require ROS 2. The optional [`ros2_ws`](ros2_ws/README.md) contains executable custom messages, an `ExecuteMission` action, five worker nodes, a fleet heartbeat watchdog, incident publication, and fault injection. [`docs/architecture.md`](docs/architecture.md) documents the adapter boundary for replacing simulated workers with Gazebo, Isaac Sim, Nav2, or physical robots.
 
 ## Scope
 

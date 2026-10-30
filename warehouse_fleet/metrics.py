@@ -19,6 +19,9 @@ def render_prometheus(manager: FleetManager) -> str:
         "# HELP warehouse_fleet_recovery_milliseconds Mean incident recovery time.",
         "# TYPE warehouse_fleet_recovery_milliseconds gauge",
         f"warehouse_fleet_recovery_milliseconds {summary['mean_time_to_recovery_ms']}",
+        "# HELP warehouse_fleet_availability_percent Mean available fleet capacity.",
+        "# TYPE warehouse_fleet_availability_percent gauge",
+        f"warehouse_fleet_availability_percent {summary['fleet_availability_pct']}",
     ]
     for robot in manager.robots.values():
         available = int(robot.status in {RobotStatus.HEALTHY, RobotStatus.BUSY})

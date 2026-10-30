@@ -1,0 +1,45 @@
+{
+  "workload": {
+    "missions": 500,
+    "robots": 5,
+    "faults": 2,
+    "seed": 2026
+  },
+  "recovery_disabled": {
+    "robots": 5,
+    "missions_total": 500,
+    "missions_completed": 500,
+    "missions_failed": 0,
+    "mission_completion_pct": 100.0,
+    "faults_injected": 2,
+    "faults_recovered": 0,
+    "automatic_recovery_pct": 0.0,
+    "median_mission_latency_ms": 36875,
+    "mean_time_to_recovery_ms": 0.0,
+    "fleet_availability_pct": 66.94,
+    "duration_ms": 246250,
+    "throughput_missions_per_minute": 121.83,
+    "recovery_enabled": 0
+  },
+  "recovery_enabled": {
+    "robots": 5,
+    "missions_total": 500,
+    "missions_completed": 500,
+    "missions_failed": 0,
+    "mission_completion_pct": 100.0,
+    "faults_injected": 2,
+    "faults_recovered": 2,
+    "automatic_recovery_pct": 100.0,
+    "median_mission_latency_ms": 12000,
+    "mean_time_to_recovery_ms": 4250.0,
+    "fleet_availability_pct": 99.04,
+    "duration_ms": 167250,
+    "throughput_missions_per_minute": 179.37,
+    "recovery_enabled": 1
+  },
+  "change": {
+    "availability_percentage_points": 32.1,
+    "throughput_pct": 47.23,
+    "duration_reduction_pct": 32.08
+  }
+}
