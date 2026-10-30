@@ -1,0 +1,32 @@
+# HELP warehouse_fleet_missions_total Total submitted missions.
+# TYPE warehouse_fleet_missions_total gauge
+warehouse_fleet_missions_total 250
+# HELP warehouse_fleet_missions_completed_total Completed missions.
+# TYPE warehouse_fleet_missions_completed_total gauge
+warehouse_fleet_missions_completed_total 250
+# HELP warehouse_fleet_incidents_total Injected and detected incidents.
+# TYPE warehouse_fleet_incidents_total gauge
+warehouse_fleet_incidents_total 12
+# HELP warehouse_fleet_recovery_milliseconds Mean incident recovery time.
+# TYPE warehouse_fleet_recovery_milliseconds gauge
+warehouse_fleet_recovery_milliseconds 3791.67
+warehouse_robot_available{robot_id="robot-01"} 1
+warehouse_robot_battery_percent{robot_id="robot-01"} 86.385
+warehouse_robot_completed_missions{robot_id="robot-01"} 51
+warehouse_robot_failed_missions{robot_id="robot-01"} 2
+warehouse_robot_available{robot_id="robot-02"} 1
+warehouse_robot_battery_percent{robot_id="robot-02"} 86.985
+warehouse_robot_completed_missions{robot_id="robot-02"} 47
+warehouse_robot_failed_missions{robot_id="robot-02"} 3
+warehouse_robot_available{robot_id="robot-03"} 1
+warehouse_robot_battery_percent{robot_id="robot-03"} 85.315
+warehouse_robot_completed_missions{robot_id="robot-03"} 56
+warehouse_robot_failed_missions{robot_id="robot-03"} 1
+warehouse_robot_available{robot_id="robot-04"} 1
+warehouse_robot_battery_percent{robot_id="robot-04"} 87.620
+warehouse_robot_completed_missions{robot_id="robot-04"} 44
+warehouse_robot_failed_missions{robot_id="robot-04"} 4
+warehouse_robot_available{robot_id="robot-05"} 1
+warehouse_robot_battery_percent{robot_id="robot-05"} 86.055
+warehouse_robot_completed_missions{robot_id="robot-05"} 52
+warehouse_robot_failed_missions{robot_id="robot-05"} 2

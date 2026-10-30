@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420">
+<style>.title{font:700 28px Arial;fill:#f7fafc}.subtitle{font:15px Arial;fill:#9fb3c8}.label{font:700 13px Arial;fill:#6ee7b7;letter-spacing:1px}.value{font:700 38px Arial;fill:#fff}.note{font:14px Arial;fill:#9fb3c8}.footer{font:13px monospace;fill:#6f8aa5}</style>
+<rect width="1200" height="420" rx="24" fill="#0a1525"/>
+<text x="36" y="48" class="title">Warehouse Fleet Reliability Benchmark</text>
+<text x="36" y="75" class="subtitle">5 simulated robot workers · seed 2026 · reproducible incident evidence</text>
+<g transform="translate(36,105)"><rect width="250" height="145" rx="16" fill="#13243b" stroke="#2c4868"/><text x="20" y="35" class="label">MISSIONS</text><text x="20" y="88" class="value">250</text><text x="20" y="119" class="note">deterministic workload</text></g><g transform="translate(322,105)"><rect width="250" height="145" rx="16" fill="#13243b" stroke="#2c4868"/><text x="20" y="35" class="label">COMPLETION</text><text x="20" y="88" class="value">100.0%</text><text x="20" y="119" class="note">completed missions</text></g><g transform="translate(608,105)"><rect width="250" height="145" rx="16" fill="#13243b" stroke="#2c4868"/><text x="20" y="35" class="label">AUTO RECOVERY</text><text x="20" y="88" class="value">100.0%</text><text x="20" y="119" class="note">12 of 12 faults</text></g><g transform="translate(894,105)"><rect width="250" height="145" rx="16" fill="#13243b" stroke="#2c4868"/><text x="20" y="35" class="label">MEAN RECOVERY</text><text x="20" y="88" class="value">3.79s</text><text x="20" y="119" class="note">detect to re-register</text></g>
+<line x1="36" y1="294" x2="1164" y2="294" stroke="#2c4868"/>
+<text x="36" y="330" class="label">RECOVERY PATH</text>
+<text x="36" y="360" class="subtitle">detect fault  →  quarantine robot  →  requeue mission  →  recover worker  →  re-register</text>
+<text x="36" y="396" class="footer">python -m warehouse_fleet.cli --missions 250 --robots 5 --seed 2026</text>
+</svg>

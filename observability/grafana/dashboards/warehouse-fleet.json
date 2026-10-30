@@ -1,0 +1,53 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Mission completion",
+      "targets": [{"expr": "warehouse_fleet_missions_completed_total / warehouse_fleet_missions_total * 100", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0},
+      "fieldConfig": {"defaults": {"unit": "percent", "min": 0, "max": 100}}
+    },
+    {
+      "type": "stat",
+      "title": "Incidents detected",
+      "targets": [{"expr": "warehouse_fleet_incidents_total", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+    },
+    {
+      "type": "stat",
+      "title": "Mean recovery time",
+      "targets": [{"expr": "warehouse_fleet_recovery_milliseconds", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0},
+      "fieldConfig": {"defaults": {"unit": "ms"}}
+    },
+    {
+      "type": "stat",
+      "title": "Available robots",
+      "targets": [{"expr": "sum(warehouse_robot_available)", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+    },
+    {
+      "type": "timeseries",
+      "title": "Battery by robot",
+      "targets": [{"expr": "warehouse_robot_battery_percent", "legendFormat": "{{robot_id}}", "refId": "A"}],
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 8},
+      "fieldConfig": {"defaults": {"unit": "percent", "min": 0, "max": 100}}
+    },
+    {
+      "type": "bargauge",
+      "title": "Completed missions by robot",
+      "targets": [{"expr": "warehouse_robot_completed_missions", "legendFormat": "{{robot_id}}", "refId": "A"}],
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 8}
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "tags": ["robotics", "fleet", "reliability"],
+  "templating": {"list": []},
+  "time": {"from": "now-15m", "to": "now"},
+  "title": "Warehouse Robot Fleet Reliability",
+  "uid": "warehouse-fleet-reliability",
+  "version": 1
+}
