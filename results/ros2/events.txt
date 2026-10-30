@@ -1,0 +1,98 @@
+data: '{"event": "mission_completed", "robot_id": "robot-02", "mission_id": "ros-mission-000027"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-03", "mission_id": "ros-mission-000028"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-04", "mission_id": "ros-mission-000029"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-05", "mission_id": "ros-mission-000030"}'
+---
+data: '{"event": "mission_requeued", "robot_id": "robot-01", "mission_id": "ros-mission-000026"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-02", "mission_id": "ros-mission-000026"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-03", "mission_id": "ros-mission-000031"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-04", "mission_id": "ros-mission-000032"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-05", "mission_id": "ros-mission-000033"}'
+---
+data: '{"event": "robot_quarantined", "robot_id": "robot-01", "mission_id": ""}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-02", "mission_id": "ros-mission-000026"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-03", "mission_id": "ros-mission-000031"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-04", "mission_id": "ros-mission-000032"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-05", "mission_id": "ros-mission-000033"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-02", "mission_id": "ros-mission-000034"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-03", "mission_id": "ros-mission-000035"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-04", "mission_id": "ros-mission-000036"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-05", "mission_id": "ros-mission-000037"}'
+---
+data: '{"event": "robot_re_registered", "robot_id": "robot-01", "mission_id": ""}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-01", "mission_id": "ros-mission-000038"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-02", "mission_id": "ros-mission-000034"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-03", "mission_id": "ros-mission-000035"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-04", "mission_id": "ros-mission-000036"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-05", "mission_id": "ros-mission-000037"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-03", "mission_id": "ros-mission-000040"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-04", "mission_id": "ros-mission-000041"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-02", "mission_id": "ros-mission-000039"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-05", "mission_id": "ros-mission-000042"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-01", "mission_id": "ros-mission-000038"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-01", "mission_id": "ros-mission-000043"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-02", "mission_id": "ros-mission-000039"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-03", "mission_id": "ros-mission-000040"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-04", "mission_id": "ros-mission-000041"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-05", "mission_id": "ros-mission-000042"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-02", "mission_id": "ros-mission-000044"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-03", "mission_id": "ros-mission-000045"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-04", "mission_id": "ros-mission-000046"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-05", "mission_id": "ros-mission-000047"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-01", "mission_id": "ros-mission-000043"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-01", "mission_id": "ros-mission-000048"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-02", "mission_id": "ros-mission-000044"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-02", "mission_id": "ros-mission-000049"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-03", "mission_id": "ros-mission-000045"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-05", "mission_id": "ros-mission-000047"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-04", "mission_id": "ros-mission-000046"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-03", "mission_id": "ros-mission-000050"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-04", "mission_id": "ros-mission-000051"}'
+---
+data: '{"event": "mission_assigned", "robot_id": "robot-05", "mission_id": "ros-mission-000052"}'
+---
+data: '{"event": "mission_completed", "robot_id": "robot-01", "mission_id": "ros-mission-000048"}'
+---

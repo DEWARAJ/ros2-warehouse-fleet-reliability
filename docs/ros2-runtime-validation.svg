@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="390" viewBox="0 0 1200 390">
+<style>.title{font:700 28px Arial;fill:#f8fafc}.sub{font:15px Arial;fill:#9fb3c8}.head{font:700 13px Arial;fill:#6ee7b7;letter-spacing:1px}.value{font:700 25px Arial;fill:white}.arrow{font:700 25px Arial;fill:#64748b}.note{font:14px Arial;fill:#b8c8d8}</style>
+<rect width="1200" height="390" rx="22" fill="#0a1525"/>
+<text x="40" y="50" class="title">ROS 2 Fleet Fault-Recovery Validation</text>
+<text x="40" y="78" class="sub">ROS 2 Humble · 6 live nodes · custom health, incident, and action interfaces</text>
+<g transform="translate(40,120)"><rect width="250" height="150" rx="15" fill="#13243b" stroke="#2c4868"/><text x="20" y="34" class="head">1 · ACTIVE MISSION</text><text x="20" y="76" class="value">robot-01 busy</text><text x="20" y="108" class="note">ros-mission-000021</text><text x="20" y="132" class="note">heartbeat healthy</text></g>
+<text x="310" y="202" class="arrow">→</text>
+<g transform="translate(350,120)"><rect width="250" height="150" rx="15" fill="#13243b" stroke="#ef4444"/><text x="20" y="34" class="head">2 · FAULT DETECTED</text><text x="20" y="76" class="value">stale heartbeat</text><text x="20" y="108" class="note">quarantine + reassign</text><text x="20" y="132" class="note">mission requeued</text></g>
+<text x="620" y="202" class="arrow">→</text>
+<g transform="translate(660,120)"><rect width="250" height="150" rx="15" fill="#13243b" stroke="#f59e0b"/><text x="20" y="34" class="head">3 · CONTINUITY</text><text x="20" y="76" class="value">mission reassigned</text><text x="20" y="108" class="note">healthy worker continues</text><text x="20" y="132" class="note">robot-01 quarantined</text></g>
+<text x="930" y="202" class="arrow">→</text>
+<g transform="translate(970,120)"><rect width="190" height="150" rx="15" fill="#13243b" stroke="#22c55e"/><text x="18" y="34" class="head">4 · RECOVERED</text><text x="18" y="76" class="value">healthy</text><text x="18" y="108" class="note">re-registered</text><text x="18" y="132" class="note">fault cleared</text></g>
+<text x="40" y="325" class="head">EVIDENCE</text><text x="40" y="353" class="sub">DDS topic captures · controller events · launch log · validation-summary.json · 0 runtime errors</text>
+</svg>

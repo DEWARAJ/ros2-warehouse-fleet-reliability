@@ -1,0 +1,6 @@
+/fleet/events [std_msgs/msg/String]
+/fleet/fault_commands [std_msgs/msg/String]
+/fleet/health [warehouse_fleet_interfaces/msg/RobotHealth]
+/fleet/incidents [warehouse_fleet_interfaces/msg/FleetIncident]
+/parameter_events [rcl_interfaces/msg/ParameterEvent]
+/rosout [rcl_interfaces/msg/Log]

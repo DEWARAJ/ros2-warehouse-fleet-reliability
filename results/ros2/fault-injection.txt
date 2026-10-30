@@ -1,0 +1,3 @@
+[INFO] [1793394621.369837769] [fault_injector]: injected robot-01:stale_heartbeat:5.0 (1/3)
+[INFO] [1793394621.697092825] [fault_injector]: injected robot-01:stale_heartbeat:5.0 (2/3)
+[INFO] [1793394622.153204878] [fault_injector]: injected robot-01:stale_heartbeat:5.0 (3/3)

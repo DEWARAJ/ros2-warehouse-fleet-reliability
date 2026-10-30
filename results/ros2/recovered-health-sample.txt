@@ -1,0 +1,11 @@
+stamp:
+  sec: 1793394638
+  nanosec: 65321152
+robot_id: robot-01
+status: healthy
+battery_pct: 92.0
+mission_id: ''
+fault_code: ''
+completed_missions: 8
+failed_missions: 1
+---

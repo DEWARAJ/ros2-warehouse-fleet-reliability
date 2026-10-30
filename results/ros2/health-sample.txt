@@ -1,0 +1,11 @@
+stamp:
+  sec: 1793394617
+  nanosec: 65297410
+robot_id: robot-01
+status: busy
+battery_pct: 96.0
+mission_id: ros-mission-000021
+fault_code: ''
+completed_missions: 4
+failed_missions: 0
+---

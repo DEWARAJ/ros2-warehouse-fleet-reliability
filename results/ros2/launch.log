@@ -1,0 +1,12 @@
+[INFO] [launch]: All log files can be found below /home/dew6/.ros/log/2026-10-30-17-10-01-051597-DESKTOP-RG8KPTB-658
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [fleet_controller-1]: process started with pid [694]
+[INFO] [robot_worker-2]: process started with pid [696]
+[INFO] [robot_worker-3]: process started with pid [698]
+[INFO] [robot_worker-4]: process started with pid [700]
+[INFO] [robot_worker-5]: process started with pid [702]
+[INFO] [robot_worker-6]: process started with pid [704]
+[robot_worker-2] [WARN] [1793394621.868851095] [robot_worker_01]: fault injected: stale_heartbeat; heartbeat pause until 634.345
+[robot_worker-2] [WARN] [1793394622.002460621] [robot_worker_01]: fault injected: stale_heartbeat; heartbeat pause until 635.112
+[robot_worker-2] [WARN] [1793394622.156255412] [robot_worker_01]: fault injected: stale_heartbeat; heartbeat pause until 635.346
+[fleet_controller-1] [WARN] [1793394624.068552637] [fleet_controller]: quarantining robot-01: stale_heartbeat

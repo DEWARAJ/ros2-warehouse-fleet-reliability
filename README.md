@@ -4,6 +4,8 @@ A deterministic reliability and incident-response lab for a simulated warehouse 
 
 ![Warehouse fleet benchmark](docs/dashboard-preview.svg)
 
+![ROS 2 runtime validation](docs/ros2-runtime-validation.svg)
+
 This repository focuses on the work around a robot fleet: mission continuity, telemetry, failure detection, recovery, SQL analysis, dashboards, automated tests, and runbooks. It is designed to be inspectable on any laptop before connecting the same contracts to ROS 2 topics and Nav2 actions.
 
 ## Verified benchmark
@@ -17,6 +19,8 @@ python -m warehouse_fleet.cli --missions 250 --robots 5 --seed 2026
 See [`results/benchmark_summary.json`](results/benchmark_summary.json) for measured mission completion, injected faults, automatic recovery, mission latency, and mean time to recovery. The SQLite evidence database and Prometheus exposition are generated alongside it. Re-running with the same seed produces the same result.
 
 The controlled [recovery experiment](docs/recovery-comparison.md) uses 500 missions and identical faults in both conditions. Automatic recovery increased simulated fleet availability from 66.94% to 99.04%, increased throughput from 121.83 to 179.37 missions per minute, and reduced workload duration by 32.08%.
+
+The [ROS 2 Humble runtime validation](docs/ros2-runtime-validation.md) launches one controller and five worker nodes, injects a stale-heartbeat fault on robot-01, captures the quarantine incident and mission requeue, and verifies that the worker later re-registers healthy. Raw topic and launch evidence is committed under `results/ros2/`.
 
 ## Reliability behavior
 
@@ -36,7 +40,7 @@ The controlled [recovery experiment](docs/recovery-comparison.md) uses 500 missi
 
 ## Quick start
 
-Python 3.11 or newer is the only dependency for the benchmark and tests.
+Python 3.10 or newer is the only dependency for the benchmark and tests.
 
 ```bash
 python -m unittest discover -s tests -v
@@ -82,6 +86,8 @@ Grafana is available at `http://localhost:3000`, Prometheus at `http://localhost
 | incident response is documented | `runbooks/` |
 | recovery improves fleet capacity | `results/recovery_comparison.json` and `docs/recovery-comparison.md` |
 | operator actions are attributable | `/api/audit` and `operator_audit` table |
+| a live ROS fault preserves mission continuity | `results/ros2/events.txt` and `docs/ros2-runtime-validation.md` |
+| the final validation scope is explicit | `docs/validation-matrix.md` |
 
 ## Repository layout
 

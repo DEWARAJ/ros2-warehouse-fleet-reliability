@@ -1,7 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import StrEnum
+try:
+    from enum import StrEnum
+except ImportError:  # Python 3.10, used by ROS 2 Humble on Ubuntu 22.04
+    from enum import Enum
+
+    class StrEnum(str, Enum):
+        def __str__(self) -> str:
+            return self.value
 
 
 class RobotStatus(StrEnum):

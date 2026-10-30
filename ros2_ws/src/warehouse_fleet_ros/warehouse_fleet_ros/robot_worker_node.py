@@ -5,6 +5,8 @@ import time
 
 import rclpy
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 from std_msgs.msg import String
 from warehouse_fleet_interfaces.action import ExecuteMission
@@ -16,16 +18,19 @@ class RobotWorker(Node):
         super().__init__("robot_worker")
         self.declare_parameter("robot_id", "robot-01")
         self.robot_id = self.get_parameter("robot_id").value
+        action_namespace = self.robot_id.replace("-", "_")
         self.publisher = self.create_publisher(RobotHealth, "/fleet/health", 20)
         self.create_subscription(String, "/fleet/fault_commands", self._fault_command, 20)
         self.create_timer(0.5, self._heartbeat)
+        self.action_callback_group = ReentrantCallbackGroup()
         self.action_server = ActionServer(
             self,
             ExecuteMission,
-            f"/{self.robot_id}/execute_mission",
+            f"/{action_namespace}/execute_mission",
             execute_callback=self._execute,
             goal_callback=lambda _: GoalResponse.ACCEPT,
             cancel_callback=lambda _: CancelResponse.ACCEPT,
+            callback_group=self.action_callback_group,
         )
         self.status = "healthy"
         self.fault = ""
@@ -62,6 +67,7 @@ class RobotWorker(Node):
             self.fault = parts[1]
             self.status = "degraded"
             self.pause_until = time.monotonic() + float(parts[2])
+            self.get_logger().warning(f"fault injected: {self.fault}; heartbeat pause until {self.pause_until:.3f}")
 
     def _execute(self, goal_handle: object) -> ExecuteMission.Result:
         request = goal_handle.request
@@ -110,8 +116,12 @@ class RobotWorker(Node):
 def main() -> None:
     rclpy.init()
     node = RobotWorker()
+    executor = MultiThreadedExecutor(num_threads=3)
+    executor.add_node(node)
     try:
-        rclpy.spin(node)
+        executor.spin()
     finally:
+        executor.shutdown()
         node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()

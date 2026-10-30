@@ -22,10 +22,12 @@ class FleetController(Node):
         self.quarantined: set[str] = set()
         self.active_missions: dict[str, tuple[str, object]] = {}
         self.retry_queue: list[str] = []
+        self.requeued_by_incident: set[tuple[str, str]] = set()
         self.mission_counter = 0
         robot_ids = [f"robot-{index:02d}" for index in range(1, 6)]
         self.action_clients = {
-            robot_id: ActionClient(self, ExecuteMission, f"/{robot_id}/execute_mission") for robot_id in robot_ids
+            robot_id: ActionClient(self, ExecuteMission, f"/{robot_id.replace('-', '_')}/execute_mission")
+            for robot_id in robot_ids
         }
         self.create_subscription(RobotHealth, "/fleet/health", self._health, 50)
         self.incident_publisher = self.create_publisher(FleetIncident, "/fleet/incidents", 20)
@@ -74,6 +76,10 @@ class FleetController(Node):
     def _mission_result(self, robot_id: str, mission_id: str, future: object) -> None:
         self.active_missions.pop(robot_id, None)
         result = future.result().result
+        incident_requeue = (robot_id, mission_id)
+        if incident_requeue in self.requeued_by_incident:
+            self.requeued_by_incident.remove(incident_requeue)
+            return
         if not result.completed:
             if mission_id not in self.retry_queue:
                 self.retry_queue.append(mission_id)
@@ -89,12 +95,16 @@ class FleetController(Node):
 
     def _incident(self, robot_id: str, mission_id: str, fault: str) -> None:
         self.quarantined.add(robot_id)
+        self.get_logger().warning(f"quarantining {robot_id}: {fault}")
         active = self.active_missions.get(robot_id)
         if active is not None:
             active_mission_id, goal_handle = active
             goal_handle.cancel_goal_async()
             if active_mission_id not in self.retry_queue:
                 self.retry_queue.append(active_mission_id)
+            self.requeued_by_incident.add((robot_id, active_mission_id))
+            self._event("mission_requeued", robot_id, active_mission_id)
+            mission_id = active_mission_id
         incident = FleetIncident()
         incident.stamp = self.get_clock().now().to_msg()
         incident.incident_id = f"{robot_id}-{self.get_clock().now().nanoseconds}"

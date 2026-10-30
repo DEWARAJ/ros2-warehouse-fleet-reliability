@@ -1,0 +1,10 @@
+stamp:
+  sec: 1793394624
+  nanosec: 68858652
+incident_id: robot-01-1793394624068910589
+robot_id: robot-01
+mission_id: ''
+fault_code: stale_heartbeat
+action: quarantine_and_reassign
+resolved: false
+---
