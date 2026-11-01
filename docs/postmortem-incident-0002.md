@@ -1,8 +1,11 @@
 # ROS 2 incident report: stale robot heartbeat
 
-**Incident:** ROS-0002  
-**Environment:** ROS 2 Humble six-node validation under WSL2  
-**Severity:** simulated mission interruption, no safety impact  
+**Incident:** ROS-0002
+
+**Environment:** ROS 2 Humble six-node validation under WSL2
+
+**Severity:** simulated mission interruption, no safety impact
+
 **Status:** recovered and runtime-validated
 
 ## Summary
