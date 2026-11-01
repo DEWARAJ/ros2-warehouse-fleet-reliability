@@ -11,6 +11,7 @@ requires-python = ">=3.10"
 [project.scripts]
 warehouse-fleet = "warehouse_fleet.cli:main"
 warehouse-fleet-server = "warehouse_fleet.server:main"
+fleetctl = "warehouse_fleet.triage:main"
 
 [project.optional-dependencies]
 postgres = ["psycopg[binary]>=3.2"]

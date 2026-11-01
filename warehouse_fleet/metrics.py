@@ -6,6 +6,11 @@ from .models import RobotStatus
 
 def render_prometheus(manager: FleetManager) -> str:
     summary = manager.summary()
+    active_missions = sum(
+        mission.status.value in {"queued", "retrying", "running"}
+        for mission in manager.missions.values()
+    )
+    unresolved_incidents = sum(incident.resolved_ms is None for incident in manager.incidents.values())
     lines = [
         "# HELP warehouse_fleet_missions_total Total submitted missions.",
         "# TYPE warehouse_fleet_missions_total gauge",
@@ -22,6 +27,12 @@ def render_prometheus(manager: FleetManager) -> str:
         "# HELP warehouse_fleet_availability_percent Mean available fleet capacity.",
         "# TYPE warehouse_fleet_availability_percent gauge",
         f"warehouse_fleet_availability_percent {summary['fleet_availability_pct']}",
+        "# HELP warehouse_fleet_active_missions Current queued, retrying, and running missions.",
+        "# TYPE warehouse_fleet_active_missions gauge",
+        f"warehouse_fleet_active_missions {active_missions}",
+        "# HELP warehouse_fleet_unresolved_incidents Current incidents without a resolution timestamp.",
+        "# TYPE warehouse_fleet_unresolved_incidents gauge",
+        f"warehouse_fleet_unresolved_incidents {unresolved_incidents}",
     ]
     for robot in manager.robots.values():
         available = int(robot.status in {RobotStatus.HEALTHY, RobotStatus.BUSY})

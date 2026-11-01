@@ -1,6 +1,7 @@
 import unittest
 import json
 import threading
+import tempfile
 import urllib.request
 from http.server import ThreadingHTTPServer
 from pathlib import Path
@@ -9,9 +10,11 @@ from uuid import uuid4
 from warehouse_fleet.manager import FAULT_RECOVERY_MS, FleetManager
 from warehouse_fleet.metrics import render_prometheus
 from warehouse_fleet.models import FaultKind, MissionStatus, RobotStatus
+from warehouse_fleet.mock_pager import make_handler as make_pager_handler
 from warehouse_fleet.scenario import run_benchmark
 from warehouse_fleet.server import LiveFleet, make_handler
 from warehouse_fleet.store import EventStore
+from warehouse_fleet.triage import analyze, parse_duration, render_text
 
 
 class FleetManagerTests(unittest.TestCase):
@@ -108,6 +111,8 @@ class FleetManagerTests(unittest.TestCase):
             self.assertEqual("ok", health["status"])
             self.assertEqual("incident-0001", incident["incident_id"])
             self.assertIn("warehouse_fleet_availability_percent", metrics)
+            self.assertIn("warehouse_fleet_active_missions", metrics)
+            self.assertIn("warehouse_fleet_unresolved_incidents", metrics)
         finally:
             server.shutdown()
             server.server_close()
@@ -126,6 +131,57 @@ class FleetManagerTests(unittest.TestCase):
             for child in directory.glob("*"):
                 child.unlink(missing_ok=True)
             directory.rmdir()
+
+    def test_triage_ranks_incidents_and_links_runbooks(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            database = Path(directory) / "evidence.db"
+            log = Path(directory) / "ros.log"
+            store = EventStore(database)
+            manager = FleetManager(robot_count=2, store=store)
+            manager.submit_mission("mission-1", 2_000)
+            manager.tick()
+            robot_id = manager.missions["mission-1"].robot_id
+            manager.inject_fault(robot_id, FaultKind.STALE_HEARTBEAT)  # type: ignore[arg-type]
+            manager.run_until_idle()
+            store.close()
+            log.write_text(
+                f"fault injected on {robot_id}: stale_heartbeat\n"
+                f"quarantining {robot_id}: stale_heartbeat\n",
+                encoding="utf-8",
+            )
+            findings = analyze(database, [log], parse_duration("1h"))
+            self.assertEqual(1, len(findings))
+            self.assertEqual("stale_heartbeat", findings[0].fault)
+            self.assertEqual(2, findings[0].log_matches)
+            self.assertEqual("runbooks/stale-heartbeat.md", findings[0].runbook)
+            self.assertIn("mission", render_text(findings, "1h"))
+
+    def test_triage_duration_rejects_invalid_input(self) -> None:
+        self.assertEqual(3_600_000, parse_duration("1h"))
+        with self.assertRaises(ValueError):
+            parse_duration("hour")
+
+    def test_mock_pager_persists_alertmanager_payload(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "alerts.jsonl"
+            server = ThreadingHTTPServer(("127.0.0.1", 0), make_pager_handler(output))
+            thread = threading.Thread(target=server.serve_forever, daemon=True)
+            thread.start()
+            request = urllib.request.Request(
+                f"http://127.0.0.1:{server.server_port}/alerts",
+                data=json.dumps({"status": "firing", "alerts": [{"labels": {"alertname": "RobotUnavailable"}}]}).encode(),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            try:
+                response = urllib.request.urlopen(request, timeout=2)
+                self.assertEqual(204, response.status)
+                record = json.loads(output.read_text(encoding="utf-8"))
+                self.assertEqual("firing", record["payload"]["status"])
+                self.assertEqual("/alerts", record["path"])
+            finally:
+                server.shutdown()
+                server.server_close()
 
 
 if __name__ == "__main__":

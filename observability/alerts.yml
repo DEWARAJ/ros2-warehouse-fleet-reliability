@@ -1,0 +1,38 @@
+groups:
+  - name: warehouse-fleet-reliability
+    rules:
+      - alert: RobotUnavailable
+        expr: warehouse_robot_available == 0
+        for: 10s
+        labels:
+          severity: page
+        annotations:
+          summary: "Robot {{ $labels.robot_id }} is unavailable"
+          runbook: "runbooks/stale-heartbeat.md"
+
+      - alert: FleetAvailabilityBelowObjective
+        expr: warehouse_fleet_availability_percent < 95
+        for: 30s
+        labels:
+          severity: page
+        annotations:
+          summary: "Fleet availability is below 95 percent"
+          runbook: "runbooks/stale-heartbeat.md"
+
+      - alert: MissionBacklogHigh
+        expr: warehouse_fleet_active_missions > 20
+        for: 1m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "Fleet mission backlog exceeds 20"
+          runbook: "runbooks/mission-timeout.md"
+
+      - alert: IncidentRequiresOperator
+        expr: warehouse_fleet_unresolved_incidents > 0
+        for: 30s
+        labels:
+          severity: page
+        annotations:
+          summary: "Fleet has an unresolved incident"
+          runbook: "runbooks/mission-timeout.md"

@@ -13,6 +13,12 @@ warehouse_fleet_recovery_milliseconds 3791.67
 # HELP warehouse_fleet_availability_percent Mean available fleet capacity.
 # TYPE warehouse_fleet_availability_percent gauge
 warehouse_fleet_availability_percent 90.93
+# HELP warehouse_fleet_active_missions Current queued, retrying, and running missions.
+# TYPE warehouse_fleet_active_missions gauge
+warehouse_fleet_active_missions 0
+# HELP warehouse_fleet_unresolved_incidents Current incidents without a resolution timestamp.
+# TYPE warehouse_fleet_unresolved_incidents gauge
+warehouse_fleet_unresolved_incidents 0
 warehouse_robot_available{robot_id="robot-01"} 1
 warehouse_robot_battery_percent{robot_id="robot-01"} 86.385
 warehouse_robot_completed_missions{robot_id="robot-01"} 51

@@ -18,7 +18,7 @@ The project focuses on the work required to keep a robot fleet useful after depl
 | Live ROS 2 graph | 1 controller and 5 robot workers |
 | Runtime fault scenario | stale heartbeat during an active mission |
 | Recovery behavior | quarantine, requeue, reassignment, re-registration |
-| Python tests | 11 passed |
+| Python tests | 14 passed |
 | Runtime errors in validated ROS run | 0 |
 | Controlled workload | 500 missions, 5 robots, identical seeded faults |
 | Simulated availability | 66.94% to 99.04% with recovery enabled |
@@ -82,6 +82,7 @@ flowchart LR
 - Prometheus-format fleet and per-robot metrics
 - Grafana dashboard provisioning
 - live HTTP operations API
+- log-triage CLI that ranks incidents by mission impact and links runbooks
 - operator-attributed fault and recovery commands
 - SQLite evidence for local execution
 - PostgreSQL schema and runtime adapter for deployment
@@ -95,6 +96,7 @@ flowchart LR
 - deterministic comparison of recovery-disabled and recovery-enabled workloads
 - automated unit and integration tests
 - incident runbooks and a sample postmortem
+- Prometheus alert rules with Alertmanager routing to a local evidence webhook
 
 ## Quick start
 
@@ -103,12 +105,26 @@ Python 3.10 or newer is required for the standalone benchmark.
 ```bash
 git clone https://github.com/DEWARAJ/ros2-warehouse-fleet-reliability.git
 cd ros2-warehouse-fleet-reliability
+python -m pip install -e .
 python -m unittest discover -s tests -v
 python -m warehouse_fleet.cli --missions 250 --robots 5 --seed 2026
 python -m warehouse_fleet.comparison
 ```
 
 The same seed reproduces the checked-in benchmark and comparison results.
+
+## Triage incidents from logs and SQL evidence
+
+```bash
+fleetctl triage \
+  --since 1h \
+  --db results/fleet_evidence.db \
+  --log results/ros2/launch.log
+```
+
+The command correlates incident records with ROS 2 log signatures, groups failures by robot and type, ranks them by affected missions and downtime, and prints the matching runbook. Use `--json` for machine-readable output.
+
+The companion [`analytics/reliability.sql`](analytics/reliability.sql) contains PostgreSQL queries for MTBF, MTTR, failure-mode Pareto analysis, hourly incident heatmaps, rolling one-hour mission success, and data-driven priority scores. The seeded findings and resulting engineering order are documented in [`docs/prioritization.md`](docs/prioritization.md).
 
 ## Run the operations API
 
@@ -148,8 +164,12 @@ docker compose up -d
 
 - Operations API: `http://localhost:9108`
 - Prometheus: `http://localhost:9090`
+- Alertmanager: `http://localhost:9093`
+- Mock pager health: `http://localhost:9119`
 - Grafana: `http://localhost:3000`
 - PostgreSQL: `localhost:5432`
+
+Prometheus evaluates robot availability, fleet availability, mission backlog, and unresolved-incident rules. Alertmanager sends firing and resolved notifications to the mock pager, which stores JSONL evidence under `results/`.
 
 The Compose topology has been structurally validated. Container runtime validation was not performed in the development environment because Docker was unavailable; this limitation is recorded in the [validation matrix](docs/validation-matrix.md).
 
@@ -194,10 +214,11 @@ Full inputs and outputs are preserved in [`results/recovery_comparison.json`](re
 | a worker returns to service after recovery | `results/ros2/recovered-health-sample.txt` |
 | recovery time is recorded | `test_incident_records_recovery_time` and the `incidents` table |
 | operations can be investigated with SQL | `analytics/operations.sql` |
+| failures are ranked by operational impact | `results/triage_report.txt`, `analytics/reliability.sql`, and `docs/prioritization.md` |
 | metrics are machine-readable | `results/fleet_metrics.prom` |
 | benchmark results are deterministic | `test_deterministic_benchmark_writes_evidence` |
 | operator actions are attributable | `/api/audit` and the `operator_audit` table |
-| incident response is documented | `runbooks/` and `docs/postmortem-incident-0001.md` |
+| incident response is documented | `runbooks/`, `docs/postmortem-incident-0001.md`, and `docs/postmortem-incident-0002.md` |
 | validation limits are explicit | `docs/validation-matrix.md` |
 
 ## Repository layout
@@ -217,7 +238,7 @@ scripts/               validation, reporting and evidence utilities
 
 ## Current scope and next integration seam
 
-The controller contracts are designed so simulated workers can later be replaced by Gazebo, Isaac Sim, Nav2, or physical robots. The mapping from fleet health fields to ROS diagnostics, odometry, battery state, action feedback, and localization confidence is documented in [`docs/architecture.md`](docs/architecture.md).
+The controller contracts are designed so simulated workers can later be replaced by Gazebo, Isaac Sim, Nav2, or physical robots. The mapping from fleet health fields to ROS diagnostics, odometry, battery state, action feedback, and localization confidence is documented in [`docs/architecture.md`](docs/architecture.md). The evidence required before describing one worker as physical is defined in [`hardware/physical-worker-plan.md`](hardware/physical-worker-plan.md).
 
 The current release demonstrates reliability behavior and operational reasoning before a physical multi-robot deployment. It deliberately avoids presenting simulator results as production warehouse evidence.
 

@@ -1,0 +1,14 @@
+Fleet incident triage | window=1d
+rank  robot     fault               incidents  missions  downtime  logs  score  runbook
+   1  robot-02  node_crash                  2         2      9.0s     0   29.0  runbooks/mission-timeout.md
+   2  robot-04  low_battery                 1         1      5.5s     0   15.5  runbooks/mission-timeout.md
+   3  robot-01  node_crash                  1         1      4.5s     0   14.5  runbooks/mission-timeout.md
+   4  robot-04  node_crash                  1         1      4.5s     0   14.5  runbooks/mission-timeout.md
+   5  robot-01  localization_drop           1         1      4.0s     0   14.0  runbooks/localization-failure.md
+   6  robot-04  localization_drop           1         1      4.0s     0   14.0  runbooks/localization-failure.md
+   7  robot-05  localization_drop           1         1      4.0s     0   14.0  runbooks/localization-failure.md
+   8  robot-02  stale_heartbeat             1         1      3.5s     0   13.5  runbooks/stale-heartbeat.md
+   9  robot-04  sensor_timeout              1         1      2.5s     0   12.5  runbooks/mission-timeout.md
+  10  robot-03  network_delay               1         1      2.0s     0   12.0  runbooks/mission-timeout.md
+  11  robot-05  network_delay               1         1      2.0s     0   12.0  runbooks/mission-timeout.md
+  12  robot-01  stale_heartbeat             0         0      0.0s     4    0.4  runbooks/stale-heartbeat.md

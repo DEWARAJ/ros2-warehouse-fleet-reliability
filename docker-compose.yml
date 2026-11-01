@@ -39,8 +39,36 @@ services:
       - "9090:9090"
     volumes:
       - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/alerts.yml:/etc/prometheus/alerts.yml:ro
     depends_on:
       - fleet-api
+      - alertmanager
+
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./observability/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    depends_on:
+      - mock-pager
+
+  mock-pager:
+    build: .
+    command:
+      - python
+      - -m
+      - warehouse_fleet.mock_pager
+      - --host
+      - 0.0.0.0
+      - --port
+      - "9119"
+      - --output
+      - /evidence/mock_pager_alerts.jsonl
+    ports:
+      - "9119:9119"
+    volumes:
+      - ./results:/evidence
 
   grafana:
     image: grafana/grafana:11.2.0

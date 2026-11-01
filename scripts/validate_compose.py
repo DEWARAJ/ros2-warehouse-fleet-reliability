@@ -7,7 +7,14 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 COMPOSE_PATH = ROOT / "docker-compose.yml"
-EXPECTED_SERVICES = {"fleet-api", "postgres", "prometheus", "grafana"}
+EXPECTED_SERVICES = {
+    "alertmanager",
+    "fleet-api",
+    "grafana",
+    "mock-pager",
+    "postgres",
+    "prometheus",
+}
 
 
 def main() -> None:
@@ -30,6 +37,12 @@ def main() -> None:
     prometheus = services["prometheus"]
     if not prometheus.get("volumes"):
         raise AssertionError("prometheus must mount its configuration")
+    if "alertmanager" not in prometheus.get("depends_on", []):
+        raise AssertionError("prometheus must depend on alertmanager")
+
+    alertmanager = services["alertmanager"]
+    if "mock-pager" not in alertmanager.get("depends_on", []):
+        raise AssertionError("alertmanager must route to mock-pager")
 
     grafana = services["grafana"]
     if not grafana.get("volumes"):
